@@ -1,33 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { HERO_CONTENT } from '../data/channels';
 
 export default function HeroBanner({ onWatchLive }) {
-  const [showVideo, setShowVideo] = useState(false);
-
-  useEffect(() => {
-    const t = setTimeout(() => setShowVideo(true), 2000);
-    return () => clearTimeout(t);
-  }, []);
+  const [muted, setMuted] = useState(true);
+  const videoRef = useRef(null);
 
   return (
     <div className="relative w-full" style={{ height: '85vh', minHeight: '500px' }}>
-      {/* Background */}
+      {/* Background video */}
       <div className="absolute inset-0 overflow-hidden">
-        {showVideo ? (
-          <iframe
-            src={`https://www.youtube.com/embed/${HERO_CONTENT.videoId}?autoplay=1&mute=1&loop=1&playlist=${HERO_CONTENT.videoId}&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1`}
-            title="Hero Preview"
-            className="w-full h-full scale-150 pointer-events-none"
-            style={{ border: 'none' }}
-            allow="autoplay; encrypted-media"
-          />
-        ) : (
-          <img
-            src={`https://picsum.photos/seed/hero/1920/1080`}
-            alt="Hero"
-            className="w-full h-full object-cover"
-          />
-        )}
+        <video
+          ref={videoRef}
+          src={HERO_CONTENT.videoUrl}
+          poster={HERO_CONTENT.poster}
+          autoPlay
+          muted={muted}
+          loop
+          playsInline
+          className="w-full h-full object-cover"
+        />
       </div>
 
       {/* Gradients */}
@@ -49,7 +40,7 @@ export default function HeroBanner({ onWatchLive }) {
         </h1>
 
         {/* Metadata */}
-        <div className="flex items-center gap-3 mb-4 text-sm text-gray-300">
+        <div className="flex items-center gap-3 mb-4 text-sm text-gray-300 flex-wrap">
           <span className="text-green-400 font-semibold">★ {HERO_CONTENT.rating}</span>
           <span>•</span>
           <span>{HERO_CONTENT.year}</span>
@@ -67,7 +58,7 @@ export default function HeroBanner({ onWatchLive }) {
         </p>
 
         {/* Buttons */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 flex-wrap">
           <button className="flex items-center gap-2 bg-white text-black px-8 py-3 rounded-lg font-bold text-base hover:bg-gray-200 transition-colors">
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
               <path d="M8 5v14l11-7z" />
@@ -81,10 +72,22 @@ export default function HeroBanner({ onWatchLive }) {
             <span className="w-2.5 h-2.5 bg-red-500 rounded-full live-dot" />
             Watch Live
           </button>
-          <button className="w-11 h-11 rounded-full border border-gray-500 flex items-center justify-center hover:border-white transition-colors">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
+          {/* Mute/unmute hero video */}
+          <button
+            onClick={() => setMuted((v) => !v)}
+            className="w-11 h-11 rounded-full border border-gray-500 flex items-center justify-center hover:border-white transition-colors"
+            title={muted ? 'Unmute' : 'Mute'}
+          >
+            {muted ? (
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
+              </svg>
+            ) : (
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072M12 6v12m-3-9.243A3 3 0 009 12a3 3 0 000 2.829M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+              </svg>
+            )}
           </button>
         </div>
       </div>

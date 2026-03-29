@@ -1,5 +1,9 @@
-// Channel definitions with YouTube embed playlists
-// Each video has: id (YouTube ID), title, duration (seconds), thumbnail
+// Real, freely playable MP4 sources:
+// - Google sample videos (storage.googleapis.com/gtv-videos-bucket)
+// - Blender open films (Sintel, Tears of Steel, Elephant's Dream, Big Buck Bunny)
+// All are royalty-free and load without embedding restrictions.
+
+const GTV = 'https://storage.googleapis.com/gtv-videos-bucket/sample';
 
 export const CHANNELS = [
   {
@@ -13,14 +17,41 @@ export const CHANNELS = [
     accentColor: '#f59e0b',
     thumbnail: 'https://picsum.photos/seed/comedy/800/450',
     playlist: [
-      { id: 'tntEJ85oG4s', title: 'Stand-Up Comedy Special', duration: 600, genre: 'Stand-up' },
-      { id: 'bTMPOZjV0mc', title: 'Classic Sitcom Moments', duration: 480, genre: 'Sitcom' },
-      { id: 'X_r1KkO93Bk', title: 'Improv Comedy Night', duration: 540, genre: 'Improv' },
-      { id: '7oWEe4L3fx0', title: 'Comedy Sketch Show', duration: 420, genre: 'Sketch' },
-      { id: 'Lg8dMr72vDA', title: 'Late Night Highlights', duration: 360, genre: 'Talk Show' },
-      { id: 'kFuFq8O_kkc', title: 'Roast Battle Championship', duration: 500, genre: 'Roast' },
-      { id: 'VRSRhEbFT1I', title: 'Funny Animals Compilation', duration: 300, genre: 'Clips' },
-      { id: 'hE1nYtfxWBk', title: 'Office Pranks Gone Wrong', duration: 420, genre: 'Clips' },
+      {
+        title: 'Big Buck Bunny',
+        videoUrl: `${GTV}/BigBuckBunny.mp4`,
+        poster: 'https://storage.googleapis.com/gtv-videos-bucket/sample/images/BigBuckBunny.jpg',
+        duration: 596,
+        genre: 'Animated Comedy',
+      },
+      {
+        title: 'For Bigger Fun',
+        videoUrl: `${GTV}/ForBiggerFun.mp4`,
+        poster: 'https://storage.googleapis.com/gtv-videos-bucket/sample/images/ForBiggerFun.jpg',
+        duration: 60,
+        genre: 'Comedy Clip',
+      },
+      {
+        title: 'Subaru Outback Adventure',
+        videoUrl: `${GTV}/SubaruOutbackOnStreetAndDirt.mp4`,
+        poster: 'https://storage.googleapis.com/gtv-videos-bucket/sample/images/SubaruOutbackOnStreetAndDirt.jpg',
+        duration: 60,
+        genre: 'Lighthearted',
+      },
+      {
+        title: 'For Bigger Joyrides',
+        videoUrl: `${GTV}/ForBiggerJoyrides.mp4`,
+        poster: 'https://storage.googleapis.com/gtv-videos-bucket/sample/images/ForBiggerJoyrides.jpg',
+        duration: 15,
+        genre: 'Comedy Clip',
+      },
+      {
+        title: 'Volkswagen GTI Laughs',
+        videoUrl: `${GTV}/VolkswagenGTIReview.mp4`,
+        poster: 'https://storage.googleapis.com/gtv-videos-bucket/sample/images/VolkswagenGTIReview.jpg',
+        duration: 60,
+        genre: 'Comedy Review',
+      },
     ],
   },
   {
@@ -34,12 +65,27 @@ export const CHANNELS = [
     accentColor: '#ec4899',
     thumbnail: 'https://picsum.photos/seed/romance/800/450',
     playlist: [
-      { id: 'p4B7P3HF9VQ', title: 'Paris Love Story', duration: 720, genre: 'Drama' },
-      { id: 'IiwYz9syCp8', title: 'Summer Romance', duration: 600, genre: 'Drama' },
-      { id: 'CbSMmNmAy-Y', title: 'Second Chance at Love', duration: 550, genre: 'Drama' },
-      { id: 'HbpVDM3FgKE', title: 'Letters Never Sent', duration: 480, genre: 'Drama' },
-      { id: 'O3fFu7pFbk4', title: 'Unexpected Connections', duration: 630, genre: 'Drama' },
-      { id: 'RTuBs6Lr8Og', title: 'Winter Warmth', duration: 510, genre: 'Drama' },
+      {
+        title: 'Sintel',
+        videoUrl: `${GTV}/Sintel.mp4`,
+        poster: 'https://storage.googleapis.com/gtv-videos-bucket/sample/images/Sintel.jpg',
+        duration: 888,
+        genre: 'Drama',
+      },
+      {
+        title: 'Elephant Dream',
+        videoUrl: `${GTV}/ElephantsDream.mp4`,
+        poster: 'https://storage.googleapis.com/gtv-videos-bucket/sample/images/ElephantsDream.jpg',
+        duration: 654,
+        genre: 'Animated Drama',
+      },
+      {
+        title: 'What Car Can You Get for a Grand',
+        videoUrl: `${GTV}/WhatCarCanYouGetForAGrand.mp4`,
+        poster: 'https://storage.googleapis.com/gtv-videos-bucket/sample/images/WhatCarCanYouGetForAGrand.jpg',
+        duration: 60,
+        genre: 'Short Film',
+      },
     ],
   },
   {
@@ -53,13 +99,41 @@ export const CHANNELS = [
     accentColor: '#ef4444',
     thumbnail: 'https://picsum.photos/seed/action/800/450',
     playlist: [
-      { id: 'JTpZGvGN5jE', title: 'High Speed Chase', duration: 480, genre: 'Action' },
-      { id: 'ZXsQAXx_ao0', title: 'Martial Arts Showdown', duration: 520, genre: 'Martial Arts' },
-      { id: '8hliCriXGpk', title: 'Heist in Motion', duration: 600, genre: 'Thriller' },
-      { id: 'X2m-08cOAbc', title: 'Desert Warfare', duration: 540, genre: 'War' },
-      { id: 'kYiRkS4KXXY', title: 'Sky Dive Rescue', duration: 450, genre: 'Action' },
-      { id: 'Xl4Bq3WV5nY', title: 'Underground Fight Club', duration: 380, genre: 'Action' },
-      { id: 'TbKfx9VrRWg', title: 'Cyber Heist 2077', duration: 620, genre: 'Sci-Fi Action' },
+      {
+        title: 'For Bigger Blazes',
+        videoUrl: `${GTV}/ForBiggerBlazes.mp4`,
+        poster: 'https://storage.googleapis.com/gtv-videos-bucket/sample/images/ForBiggerBlazes.jpg',
+        duration: 15,
+        genre: 'Action Clip',
+      },
+      {
+        title: 'For Bigger Escapes',
+        videoUrl: `${GTV}/ForBiggerEscapes.mp4`,
+        poster: 'https://storage.googleapis.com/gtv-videos-bucket/sample/images/ForBiggerEscapes.jpg',
+        duration: 15,
+        genre: 'Chase',
+      },
+      {
+        title: 'We Are Going On Bullrun',
+        videoUrl: `${GTV}/WeAreGoingOnBullrun.mp4`,
+        poster: 'https://storage.googleapis.com/gtv-videos-bucket/sample/images/WeAreGoingOnBullrun.jpg',
+        duration: 46,
+        genre: 'Adventure',
+      },
+      {
+        title: 'Tears of Steel',
+        videoUrl: `${GTV}/TearsOfSteel.mp4`,
+        poster: 'https://storage.googleapis.com/gtv-videos-bucket/sample/images/TearsOfSteel.jpg',
+        duration: 734,
+        genre: 'Sci-Fi Action',
+      },
+      {
+        title: 'For Bigger Joyrides',
+        videoUrl: `${GTV}/ForBiggerJoyrides.mp4`,
+        poster: 'https://storage.googleapis.com/gtv-videos-bucket/sample/images/ForBiggerJoyrides.jpg',
+        duration: 15,
+        genre: 'Action Clip',
+      },
     ],
   },
   {
@@ -73,12 +147,34 @@ export const CHANNELS = [
     accentColor: '#8b5cf6',
     thumbnail: 'https://picsum.photos/seed/thriller/800/450',
     playlist: [
-      { id: 'oHpqkQzHbKo', title: 'The Vanishing Act', duration: 660, genre: 'Mystery' },
-      { id: 'lxb3lnbsPcg', title: 'Midnight Witness', duration: 580, genre: 'Crime' },
-      { id: '9PqM2xDaCGo', title: 'Shadows & Lies', duration: 610, genre: 'Thriller' },
-      { id: 'BmGFPS8YSNQ', title: 'The Last Suspect', duration: 540, genre: 'Crime' },
-      { id: 'dIMmpa4zp8g', title: 'No Way Out', duration: 490, genre: 'Thriller' },
-      { id: 'JWTdI3gvyAU', title: 'Cold Case Files', duration: 720, genre: 'True Crime' },
+      {
+        title: 'For Bigger Meltdowns',
+        videoUrl: `${GTV}/ForBiggerMeltdowns.mp4`,
+        poster: 'https://storage.googleapis.com/gtv-videos-bucket/sample/images/ForBiggerMeltdowns.jpg',
+        duration: 15,
+        genre: 'Suspense Clip',
+      },
+      {
+        title: 'Tears of Steel',
+        videoUrl: `${GTV}/TearsOfSteel.mp4`,
+        poster: 'https://storage.googleapis.com/gtv-videos-bucket/sample/images/TearsOfSteel.jpg',
+        duration: 734,
+        genre: 'Sci-Fi Thriller',
+      },
+      {
+        title: 'Sintel',
+        videoUrl: `${GTV}/Sintel.mp4`,
+        poster: 'https://storage.googleapis.com/gtv-videos-bucket/sample/images/Sintel.jpg',
+        duration: 888,
+        genre: 'Dark Fantasy',
+      },
+      {
+        title: 'For Bigger Blazes',
+        videoUrl: `${GTV}/ForBiggerBlazes.mp4`,
+        poster: 'https://storage.googleapis.com/gtv-videos-bucket/sample/images/ForBiggerBlazes.jpg',
+        duration: 15,
+        genre: 'Thriller Clip',
+      },
     ],
   },
   {
@@ -92,11 +188,41 @@ export const CHANNELS = [
     accentColor: '#14b8a6',
     thumbnail: 'https://picsum.photos/seed/documentary/800/450',
     playlist: [
-      { id: 'qsOUv9GFsGQ', title: 'Ocean Depths Explored', duration: 720, genre: 'Nature' },
-      { id: 'Au5_e7C6fFA', title: 'Space: The Final Journey', duration: 660, genre: 'Science' },
-      { id: 'XFqn3uy238E', title: 'Ancient Civilizations', duration: 600, genre: 'History' },
-      { id: 'IY8_F-jK5ik', title: 'Climate & Survival', duration: 540, genre: 'Environment' },
-      { id: 'J7UwSVsiwzI', title: 'Street Food Journeys', duration: 480, genre: 'Food' },
+      {
+        title: 'Volkswagen GTI: Road Test',
+        videoUrl: `${GTV}/VolkswagenGTIReview.mp4`,
+        poster: 'https://storage.googleapis.com/gtv-videos-bucket/sample/images/VolkswagenGTIReview.jpg',
+        duration: 60,
+        genre: 'Auto Documentary',
+      },
+      {
+        title: 'Subaru Outback: Street & Dirt',
+        videoUrl: `${GTV}/SubaruOutbackOnStreetAndDirt.mp4`,
+        poster: 'https://storage.googleapis.com/gtv-videos-bucket/sample/images/SubaruOutbackOnStreetAndDirt.jpg',
+        duration: 60,
+        genre: 'Auto Documentary',
+      },
+      {
+        title: 'What Car Can You Get for a Grand',
+        videoUrl: `${GTV}/WhatCarCanYouGetForAGrand.mp4`,
+        poster: 'https://storage.googleapis.com/gtv-videos-bucket/sample/images/WhatCarCanYouGetForAGrand.jpg',
+        duration: 60,
+        genre: 'Investigative',
+      },
+      {
+        title: 'We Are Going On Bullrun',
+        videoUrl: `${GTV}/WeAreGoingOnBullrun.mp4`,
+        poster: 'https://storage.googleapis.com/gtv-videos-bucket/sample/images/WeAreGoingOnBullrun.jpg',
+        duration: 46,
+        genre: 'Adventure Doc',
+      },
+      {
+        title: 'Elephant Dream: Making Of',
+        videoUrl: `${GTV}/ElephantsDream.mp4`,
+        poster: 'https://storage.googleapis.com/gtv-videos-bucket/sample/images/ElephantsDream.jpg',
+        duration: 654,
+        genre: 'Behind the Scenes',
+      },
     ],
   },
   {
@@ -110,12 +236,34 @@ export const CHANNELS = [
     accentColor: '#3b82f6',
     thumbnail: 'https://picsum.photos/seed/scifi/800/450',
     playlist: [
-      { id: 'RnMQxHlDKss', title: 'Galactic Frontier', duration: 700, genre: 'Space Opera' },
-      { id: 'YoHD9XEInc0', title: 'Android Dreams', duration: 620, genre: 'Cyberpunk' },
-      { id: 'Ua0RoF-fT5w', title: 'Time Paradox', duration: 560, genre: 'Time Travel' },
-      { id: 'g0f_BRYJLJE', title: 'The Last Colony', duration: 640, genre: 'Sci-Fi' },
-      { id: 'tEpCsSxBHkA', title: 'Neural Interface', duration: 500, genre: 'Cyberpunk' },
-      { id: 'hJqxfULMsck', title: 'First Contact Protocol', duration: 580, genre: 'Alien' },
+      {
+        title: 'Tears of Steel',
+        videoUrl: `${GTV}/TearsOfSteel.mp4`,
+        poster: 'https://storage.googleapis.com/gtv-videos-bucket/sample/images/TearsOfSteel.jpg',
+        duration: 734,
+        genre: 'Sci-Fi',
+      },
+      {
+        title: 'Elephant Dream',
+        videoUrl: `${GTV}/ElephantsDream.mp4`,
+        poster: 'https://storage.googleapis.com/gtv-videos-bucket/sample/images/ElephantsDream.jpg',
+        duration: 654,
+        genre: 'Sci-Fi Animated',
+      },
+      {
+        title: 'Sintel',
+        videoUrl: `${GTV}/Sintel.mp4`,
+        poster: 'https://storage.googleapis.com/gtv-videos-bucket/sample/images/Sintel.jpg',
+        duration: 888,
+        genre: 'Fantasy Sci-Fi',
+      },
+      {
+        title: 'Big Buck Bunny: Alternate Universe',
+        videoUrl: `${GTV}/BigBuckBunny.mp4`,
+        poster: 'https://storage.googleapis.com/gtv-videos-bucket/sample/images/BigBuckBunny.jpg',
+        duration: 596,
+        genre: 'Animated Sci-Fi',
+      },
     ],
   },
 ];
@@ -142,12 +290,16 @@ export const NEW_ARRIVALS = [
   { id: 'n7', title: 'Mirror Dark', genre: 'Thriller', thumbnail: 'https://picsum.photos/seed/mirror/300/170', rating: '8.3', year: 2025 },
 ];
 
+export const HERO_VIDEO_URL = 'https://storage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4';
+export const HERO_POSTER_URL = 'https://storage.googleapis.com/gtv-videos-bucket/sample/images/TearsOfSteel.jpg';
+
 export const HERO_CONTENT = {
-  title: 'Neon Nights',
-  tagline: 'Season 2 Now Live',
-  description: 'A detective navigates the neon-lit underbelly of a future metropolis, where technology and crime blur into a deadly game of survival.',
-  genre: ['Thriller', 'Sci-Fi', 'Crime'],
+  title: 'Tears of Steel',
+  tagline: 'Now Streaming',
+  description: 'In a dystopian future, a group of rebels attempt to control an artificial intelligence that could save — or destroy — what remains of humanity.',
+  genre: ['Sci-Fi', 'Action', 'Drama'],
   rating: '9.1',
-  year: 2024,
-  videoId: 'dQw4w9WgXcQ',
+  year: 2012,
+  videoUrl: HERO_VIDEO_URL,
+  poster: HERO_POSTER_URL,
 };

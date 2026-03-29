@@ -106,13 +106,13 @@ export function useSchedule(channel) {
 }
 
 /**
- * Returns the YouTube video ID and seek offset for the current moment.
+ * Returns the video URL and seek offset for the current moment.
  */
 export function useCurrentVideo(channel) {
   const { currentItem, elapsed } = useSchedule(channel);
 
   return {
-    videoId: currentItem?.id || null,
+    videoUrl: currentItem?.videoUrl || null,
     seekTo: Math.floor(elapsed),
     currentItem,
   };
