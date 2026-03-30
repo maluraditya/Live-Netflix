@@ -1,37 +1,101 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useSchedule } from '../hooks/useSchedule';
+import { loadYouTubeAPI } from '../utils/youtubeApi';
 
 export default function VideoPlayer({ channel, onClose, onWatchTime }) {
-  const { currentItem, elapsed, progress, visibleSchedule, upcomingItems, formatTime } = useSchedule(channel);
-  const [showControls, setShowControls]   = useState(true);
-  const [showSchedule, setShowSchedule]   = useState(false);
-  const [joining, setJoining]             = useState(true); // "Joining stream…" state
-  const controlsTimer = useRef(null);
-  const watchTimer    = useRef(null);
+  const { currentItem, elapsed, progress, visibleSchedule, upcomingItems } = useSchedule(channel);
+  const [showControls, setShowControls] = useState(true);
+  const [showSchedule, setShowSchedule] = useState(false);
+  const [joining, setJoining]           = useState(true);
+  const [muted, setMuted]               = useState(false);
 
-  // Simulate joining delay — hides YouTube loading state
-  useEffect(() => {
-    const t = setTimeout(() => setJoining(false), 1800);
-    return () => clearTimeout(t);
-  }, []);
+  const playerRef        = useRef(null);
+  const elapsedRef       = useRef(elapsed);
+  const currentVideoRef  = useRef(null);
+  const controlsTimer    = useRef(null);
+  const watchTimer       = useRef(null);
+  const playerDivId      = useRef(`yt-${channel.id}-${Date.now()}`).current;
 
-  // Re-show joining overlay when track changes
-  const lastVideoId = useRef(null);
+  // Keep elapsed accessible without re-creating the init effect
+  useEffect(() => { elapsedRef.current = elapsed; }, [elapsed]);
+
+  // Create YT.Player once on mount
   useEffect(() => {
-    if (currentItem && currentItem.videoId !== lastVideoId.current) {
-      setJoining(true);
-      setTimeout(() => setJoining(false), 1800);
-      lastVideoId.current = currentItem.videoId;
-    }
-  }, [currentItem]);
+    let destroyed = false;
+
+    loadYouTubeAPI(() => {
+      if (destroyed) return;
+
+      playerRef.current = new window.YT.Player(playerDivId, {
+        videoId: currentItem?.videoId,
+        playerVars: {
+          autoplay:        1,
+          controls:        0,
+          disablekb:       1,
+          fs:              0,
+          iv_load_policy:  3,
+          modestbranding:  1,
+          playsinline:     1,
+          rel:             0,
+          start:           Math.floor(elapsedRef.current),
+          origin:          window.location.origin,
+        },
+        events: {
+          onReady(e) {
+            e.target.seekTo(elapsedRef.current, true);
+            e.target.playVideo();
+            setTimeout(() => { if (!destroyed) setJoining(false); }, 1200);
+          },
+          onStateChange(e) {
+            // Keep video playing — YouTube sometimes pauses after seek
+            if (e.data === window.YT.PlayerState.PAUSED) {
+              e.target.playVideo();
+            }
+          },
+        },
+      });
+
+      currentVideoRef.current = currentItem?.videoId;
+    });
+
+    return () => {
+      destroyed = true;
+      if (playerRef.current) {
+        try { playerRef.current.destroy(); } catch (_) {}
+        playerRef.current = null;
+      }
+    };
+  }, []); // intentionally empty — player must be created only once
+
+  // Switch video without remounting the player
+  useEffect(() => {
+    if (!currentItem) return;
+    if (currentItem.videoId === currentVideoRef.current) return;
+    if (!playerRef.current || typeof playerRef.current.loadVideoById !== 'function') return;
+
+    setJoining(true);
+    playerRef.current.loadVideoById({
+      videoId:      currentItem.videoId,
+      startSeconds: Math.floor(elapsedRef.current),
+    });
+    currentVideoRef.current = currentItem.videoId;
+    setTimeout(() => setJoining(false), 1200);
+  }, [currentItem]); // videoId change triggers load — elapsedRef is a ref, stable by design
+
+  // Mute / unmute without remounting
+  useEffect(() => {
+    if (!playerRef.current || typeof playerRef.current.mute !== 'function') return;
+    if (muted) playerRef.current.mute();
+    else playerRef.current.unMute();
+  }, [muted]);
 
   const resetControlsTimer = useCallback(() => {
     setShowControls(true);
     clearTimeout(controlsTimer.current);
     controlsTimer.current = setTimeout(() => {
-      if (!showSchedule) setShowControls(false);
+      setShowControls(false);
     }, 3500);
-  }, [showSchedule]);
+  }, []);
 
   useEffect(() => {
     resetControlsTimer();
@@ -49,20 +113,19 @@ export default function VideoPlayer({ channel, onClose, onWatchTime }) {
     const handleKey = (e) => {
       if (e.key === 'Escape') onClose();
       if (e.key === 's' || e.key === 'S') setShowSchedule((v) => !v);
+      if (e.key === 'm' || e.key === 'M') setMuted((v) => !v);
     };
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
   }, [onClose]);
 
-  const remainingSeconds = currentItem ? Math.max(0, currentItem.duration - elapsed) : 0;
   const fmt = (s) => {
     const abs = Math.abs(s);
     return `${Math.floor(abs / 60)}:${String(Math.floor(abs % 60)).padStart(2, '0')}`;
   };
+  const remainingSeconds = currentItem ? Math.max(0, currentItem.duration - elapsed) : 0;
 
   if (!currentItem) return null;
-
-  const embedSrc = `https://www.youtube.com/embed/${currentItem.videoId}?autoplay=1&start=${Math.floor(elapsed)}&rel=0&modestbranding=1&playsinline=1&iv_load_policy=3&color=white`;
 
   return (
     <div
@@ -71,16 +134,22 @@ export default function VideoPlayer({ channel, onClose, onWatchTime }) {
       onClick={resetControlsTimer}
       style={{ cursor: showControls ? 'default' : 'none' }}
     >
-      {/* YouTube iframe — full screen */}
-      <iframe
-        key={`${channel.id}-${currentItem.videoId}-${currentItem.startTime}`}
-        src={embedSrc}
-        title={currentItem.title}
-        className="absolute inset-0 w-full h-full"
-        style={{ border: 'none' }}
-        allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
-        allowFullScreen
-      />
+      {/* YouTube player — oversized container crops all YouTube chrome */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div
+          id={playerDivId}
+          style={{
+            position: 'absolute',
+            top: '-80px', bottom: '-80px',
+            left: '-4px',  right: '-4px',
+            pointerEvents: 'none',
+          }}
+        />
+      </div>
+
+      {/* Black bars covering any remaining YouTube branding */}
+      <div className="absolute bottom-0 left-0 right-0 pointer-events-none" style={{ height: '80px', background: '#000', zIndex: 2 }} />
+      <div className="absolute top-0 left-0 right-0 pointer-events-none"    style={{ height: '80px', background: '#000', zIndex: 2 }} />
 
       {/* Joining overlay */}
       {joining && (
@@ -92,13 +161,12 @@ export default function VideoPlayer({ channel, onClose, onWatchTime }) {
         </div>
       )}
 
-      {/* Top controls overlay */}
+      {/* Top controls */}
       <div
         className={`absolute top-0 left-0 right-0 z-10 transition-opacity duration-300 ${showControls ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
-        style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.85) 0%, transparent 100%)', paddingBottom: '48px' }}
+        style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, transparent 100%)', paddingBottom: '48px', zIndex: 10 }}
       >
         <div className="flex items-center justify-between px-5 py-5">
-          {/* Back + channel info */}
           <div className="flex items-center gap-3">
             <button onClick={onClose}
               className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors backdrop-blur-sm border border-white/10">
@@ -118,31 +186,49 @@ export default function VideoPlayer({ channel, onClose, onWatchTime }) {
             </div>
           </div>
 
-          {/* Schedule toggle */}
-          <button
-            onClick={() => setShowSchedule((v) => !v)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all backdrop-blur-sm border ${
-              showSchedule
-                ? 'bg-white/15 border-white/20 text-white'
-                : 'bg-black/30 border-white/10 text-gray-300 hover:bg-white/10 hover:text-white'
-            }`}
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-            Schedule
-          </button>
+          <div className="flex items-center gap-2">
+            {/* Mute toggle */}
+            <button
+              onClick={(e) => { e.stopPropagation(); setMuted((v) => !v); }}
+              className="w-10 h-10 rounded-full bg-black/40 hover:bg-white/15 flex items-center justify-center transition-colors backdrop-blur-sm border border-white/10"
+              title={muted ? 'Unmute' : 'Mute'}
+            >
+              {muted ? (
+                <svg className="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>
+                </svg>
+              ) : (
+                <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+                </svg>
+              )}
+            </button>
+
+            {/* Schedule toggle */}
+            <button
+              onClick={(e) => { e.stopPropagation(); setShowSchedule((v) => !v); }}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all backdrop-blur-sm border ${
+                showSchedule
+                  ? 'bg-white/15 border-white/20 text-white'
+                  : 'bg-black/30 border-white/10 text-gray-300 hover:bg-white/10 hover:text-white'
+              }`}
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              Schedule
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Bottom now-playing strip — floats above YouTube controls */}
+      {/* Bottom now-playing strip */}
       <div
         className={`absolute bottom-0 left-0 right-0 z-10 transition-opacity duration-300 ${showControls ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
-        style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%)', paddingTop: '60px' }}
+        style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.95) 0%, transparent 100%)', paddingTop: '60px', zIndex: 10 }}
       >
-        <div className="px-5 pb-16">
-          {/* Now Playing info */}
+        <div className="px-5 pb-8">
           <div className="mb-3">
             <div className="flex items-center gap-2 mb-0.5">
               <span className="text-gray-500 text-xs uppercase tracking-widest font-semibold">Now Playing</span>
@@ -156,7 +242,6 @@ export default function VideoPlayer({ channel, onClose, onWatchTime }) {
             )}
           </div>
 
-          {/* Progress bar */}
           <div className="mb-2">
             <div className="relative h-0.5 bg-white/15 rounded-full">
               <div className="absolute left-0 top-0 h-full rounded-full transition-all duration-1000"
@@ -174,7 +259,7 @@ export default function VideoPlayer({ channel, onClose, onWatchTime }) {
             </div>
           </div>
 
-          <p className="text-gray-700 text-xs text-center">ESC to exit · S for schedule</p>
+          <p className="text-gray-700 text-xs text-center">ESC to exit · S for schedule · M to mute</p>
         </div>
       </div>
 
@@ -183,7 +268,8 @@ export default function VideoPlayer({ channel, onClose, onWatchTime }) {
         className={`absolute top-0 right-0 bottom-0 w-72 md:w-80 z-20 transition-transform duration-300 ease-out ${
           showSchedule ? 'translate-x-0' : 'translate-x-full'
         }`}
-        style={{ background: 'rgba(0,0,0,0.92)', backdropFilter: 'blur(20px)', borderLeft: '1px solid rgba(255,255,255,0.08)' }}
+        style={{ background: 'rgba(0,0,0,0.95)', backdropFilter: 'blur(20px)', borderLeft: '1px solid rgba(255,255,255,0.08)' }}
+        onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between px-5 py-5 border-b border-white/8">
           <div>
