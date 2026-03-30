@@ -1,34 +1,69 @@
 import React from 'react';
 import HeroBanner from '../components/HeroBanner';
+import ContextGreeting from '../components/ContextGreeting';
+import PremierCard from '../components/PremierCard';
+import GlobalPremiersRow from '../components/GlobalPremiersRow';
 import ContentRow from '../components/ContentRow';
 import LiveChannelsRow from '../components/LiveChannelsRow';
 import RecentlyWatched from '../components/RecentlyWatched';
 import { TRENDING, NEW_ARRIVALS } from '../data/channels';
 
-export default function HomePage({ onChannelClick, recentlyWatched, sortedChannels, onNavigateToLive }) {
+export default function HomePage({
+  userName,
+  onChannelClick,
+  recentlyWatched,
+  sortedChannels,
+  onNavigateToLive,
+  // Premier props
+  preferredChannel,
+  premierState,
+  todaysPremierTime,
+  formattedTime,
+  pushOneHour,
+  cancelToday,
+  pushesRemaining,
+}) {
   return (
     <div className="bg-brand-dark min-h-screen">
       {/* Hero */}
       <HeroBanner onWatchLive={onNavigateToLive} />
 
-      {/* Content rows — offset to overlap hero bottom */}
-      <div className="-mt-24 relative z-10">
-        {/* Recently Watched */}
+      {/* Content — offset to overlap hero bottom gradient */}
+      <div className="-mt-20 relative z-10">
+
+        {/* Personalised greeting */}
+        <ContextGreeting userName={userName} />
+
+        {/* Personal Premier card */}
+        {preferredChannel && premierState !== 'expired' && (
+          <PremierCard
+            channel={preferredChannel}
+            userName={userName}
+            premierState={premierState}
+            todaysPremierTime={todaysPremierTime}
+            formattedTime={formattedTime}
+            pushOneHour={pushOneHour}
+            cancelToday={cancelToday}
+            pushesRemaining={pushesRemaining}
+            onJoin={onChannelClick}
+          />
+        )}
+
+        {/* Global Watch Parties */}
+        <GlobalPremiersRow onChannelClick={onChannelClick} />
+
+        {/* Continue Watching */}
         <RecentlyWatched history={recentlyWatched} onChannelClick={onChannelClick} />
 
-        {/* Live Channels */}
+        {/* Live Channels row */}
         <LiveChannelsRow
           onChannelClick={onChannelClick}
           sortedChannels={sortedChannels}
         />
 
-        {/* Trending */}
+        {/* VOD rows */}
         <ContentRow title="Trending Now" items={TRENDING} />
-
-        {/* New */}
         <ContentRow title="New Arrivals" items={NEW_ARRIVALS} badge="New" />
-
-        {/* More rows */}
         <ContentRow
           title="Top Rated"
           items={[...TRENDING].sort((a, b) => parseFloat(b.rating) - parseFloat(a.rating))}
@@ -41,7 +76,7 @@ export default function HomePage({ onChannelClick, recentlyWatched, sortedChanne
             <span className="text-white">Vault</span>
           </p>
           <p className="text-gray-600 text-sm">© 2025 StreamVault. All rights reserved.</p>
-          <p className="text-gray-700 text-xs mt-2">Live Channels Platform — Something is always playing.</p>
+          <p className="text-gray-700 text-xs mt-1">Something is always playing.</p>
         </footer>
       </div>
     </div>
