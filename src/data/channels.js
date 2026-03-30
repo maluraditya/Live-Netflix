@@ -15,7 +15,7 @@ export const CHANNELS = [
     playlist: [
       { videoId: 'YE7VzlLtp-4', title: 'Big Buck Bunny',       duration: 596, genre: 'Animated Comedy' },
       { videoId: 'pz6HbPiaN0E', title: 'Sprite Fright',        duration: 602, genre: 'Comedy Short'    },
-      { videoId: '1LiqCFBMG_k', title: 'Coffee Run',           duration: 190, genre: 'Comedy'          },
+      { videoId: 'PVGeM40dABA', title: 'Coffee Run',            duration: 190, genre: 'Comedy'          },
       { videoId: 'SkVqJ1SGeL0', title: 'Caminandes: Llamigos', duration: 152, genre: 'Animated'        },
       { videoId: 'mN0zPOpADL4', title: 'Agent 327',            duration: 203, genre: 'Action Comedy'   },
     ],
@@ -31,7 +31,7 @@ export const CHANNELS = [
     thumbnail: yt('eRsGyueVLvQ'),
     playlist: [
       { videoId: 'eRsGyueVLvQ', title: 'Sintel',                 duration: 888, genre: 'Drama'          },
-      { videoId: '1LiqCFBMG_k', title: 'Coffee Run',             duration: 190, genre: 'Short Film'     },
+      { videoId: 'PVGeM40dABA', title: 'Coffee Run',              duration: 190, genre: 'Short Film'     },
       { videoId: 'SkVqJ1SGeL0', title: 'Caminandes: Llamigos',   duration: 152, genre: 'Animated Drama' },
       { videoId: '_9LX9HSU9NM', title: "Elephant's Dream",       duration: 654, genre: 'Drama'          },
       { videoId: 'YE7VzlLtp-4', title: 'Big Buck Bunny',         duration: 596, genre: 'Feel Good'      },
@@ -84,7 +84,7 @@ export const CHANNELS = [
       { videoId: 'Y-rmzh0PI3c', title: 'Cosmos Laundromat',         duration: 729, genre: 'Philosophical' },
       { videoId: 'YE7VzlLtp-4', title: 'Big Buck Bunny: In Nature', duration: 596, genre: 'Nature'        },
       { videoId: 'mN0zPOpADL4', title: 'Agent 327: Production',     duration: 203, genre: 'Making Of'     },
-      { videoId: '1LiqCFBMG_k', title: 'Coffee Run',                duration: 190, genre: 'Short Doc'     },
+      { videoId: 'PVGeM40dABA', title: 'Coffee Run',                 duration: 190, genre: 'Short Doc'     },
     ],
   },
   {
