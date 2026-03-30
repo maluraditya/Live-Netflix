@@ -27,6 +27,8 @@ export default function VideoPlayer({ channel, onClose, onWatchTime }) {
       if (destroyed) return;
 
       playerRef.current = new window.YT.Player(playerDivId, {
+        width:   '100%',
+        height:  '100%',
         videoId: currentItem?.videoId,
         playerVars: {
           autoplay:        1,
@@ -42,6 +44,11 @@ export default function VideoPlayer({ channel, onClose, onWatchTime }) {
         },
         events: {
           onReady(e) {
+            // Force the created iframe to fill its container
+            const iframe = e.target.getIframe();
+            if (iframe) {
+              iframe.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;border:none;';
+            }
             e.target.seekTo(elapsedRef.current, true);
             e.target.playVideo();
             setTimeout(() => { if (!destroyed) setJoining(false); }, 1200);
@@ -134,22 +141,14 @@ export default function VideoPlayer({ channel, onClose, onWatchTime }) {
       onClick={resetControlsTimer}
       style={{ cursor: showControls ? 'default' : 'none' }}
     >
-      {/* YouTube player — oversized container crops all YouTube chrome */}
+      {/* YouTube player — fills screen, iframe sized explicitly via constructor */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div
-          id={playerDivId}
-          style={{
-            position: 'absolute',
-            top: '-80px', bottom: '-80px',
-            left: '-4px',  right: '-4px',
-            pointerEvents: 'none',
-          }}
-        />
+        <div id={playerDivId} style={{ width: '100%', height: '100%' }} />
       </div>
 
-      {/* Black bars covering any remaining YouTube branding */}
-      <div className="absolute bottom-0 left-0 right-0 pointer-events-none" style={{ height: '80px', background: '#000', zIndex: 2 }} />
-      <div className="absolute top-0 left-0 right-0 pointer-events-none"    style={{ height: '80px', background: '#000', zIndex: 2 }} />
+      {/* Black strips covering YouTube logo (bottom-right) and any top chrome */}
+      <div className="absolute pointer-events-none" style={{ bottom: 0, left: 0, right: 0, height: '44px', background: '#000', zIndex: 2 }} />
+      <div className="absolute pointer-events-none" style={{ top: 0, left: 0, right: 0, height: '8px',  background: '#000', zIndex: 2 }} />
 
       {/* Joining overlay */}
       {joining && (
