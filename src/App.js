@@ -11,77 +11,55 @@ import { CHANNELS } from './data/channels';
 import './index.css';
 
 export default function App() {
-  const [currentPage, setCurrentPage]   = useState('home');
+  const [currentPage,   setCurrentPage]   = useState('home');
   const [activeChannel, setActiveChannel] = useState(null);
-  const [userName, setUserName]          = useState(() => getUserName());
+  const [userName,      setUserName]      = useState(() => getUserName());
 
   const {
-    addToHistory,
-    updateWatchTime,
-    getSortedChannels,
-    getRecentlyWatched,
-    preferences,
-    history,
+    addToHistory, updateWatchTime,
+    getSortedChannels, getRecentlyWatched,
+    preferences, history,
   } = useWatchHistory();
 
   const sortedChannels  = getSortedChannels(CHANNELS);
   const recentlyWatched = getRecentlyWatched();
 
   const {
-    preferredChannel,
-    premierState,
-    todaysPremierTime,
-    formattedTime,
-    pushOneHour,
-    cancelToday,
-    pushesRemaining,
-  } = usePremierSchedule(preferences, history, sortedChannels);
+    premierChannel, editorial,
+    premierState, todaysPremierTime, formattedTime,
+    pushOneHour, cancelToday, pushesRemaining,
+  } = usePremierSchedule(preferences, history);
 
-  const handleChannelClick = useCallback(
-    (channel) => {
-      if (!channel) {
-        setCurrentPage('live');
-        return;
-      }
-      setActiveChannel(channel);
-      addToHistory(channel.id, channel.name, channel.playlist[0]?.title || '', 0);
-    },
-    [addToHistory]
-  );
+  const handleChannelClick = useCallback((channel) => {
+    if (!channel) { setCurrentPage('live'); return; }
+    setActiveChannel(channel);
+    addToHistory(channel.id, channel.name, channel.playlist[0]?.title || '', 0);
+  }, [addToHistory]);
 
   const handleClosePlayer = useCallback(() => setActiveChannel(null), []);
 
-  const handleWatchTime = useCallback(
-    (channelId, seconds) => updateWatchTime(channelId, seconds),
-    [updateWatchTime]
-  );
+  const handleWatchTime = useCallback((channelId, seconds) => {
+    updateWatchTime(channelId, seconds);
+  }, [updateWatchTime]);
 
   const handleNavigate = useCallback((page) => {
     setCurrentPage(page);
     setActiveChannel(null);
   }, []);
 
-  const handleNameComplete = useCallback((name) => {
-    setUserName(name);
-  }, []);
-
-  // Lock scroll when player is open
   useEffect(() => {
     document.body.style.overflow = activeChannel ? 'hidden' : '';
     return () => { document.body.style.overflow = ''; };
   }, [activeChannel]);
 
   return (
-    <div className="min-h-screen bg-brand-dark text-white">
-      {/* First-visit name prompt */}
-      <NamePrompt onComplete={handleNameComplete} />
+    <div className="min-h-screen bg-[#141414] text-white">
+      <NamePrompt onComplete={setUserName} />
 
-      {/* Navbar — hidden in player */}
       {!activeChannel && (
         <Navbar onNavigate={handleNavigate} currentPage={currentPage} />
       )}
 
-      {/* Pages */}
       {!activeChannel && currentPage === 'home' && (
         <HomePage
           userName={userName}
@@ -89,7 +67,8 @@ export default function App() {
           recentlyWatched={recentlyWatched}
           sortedChannels={sortedChannels}
           onNavigateToLive={() => setCurrentPage('live')}
-          preferredChannel={preferredChannel}
+          premierChannel={premierChannel}
+          editorial={editorial}
           premierState={premierState}
           todaysPremierTime={todaysPremierTime}
           formattedTime={formattedTime}
@@ -106,7 +85,6 @@ export default function App() {
         />
       )}
 
-      {/* Full-screen video player */}
       {activeChannel && (
         <VideoPlayer
           channel={activeChannel}
@@ -115,7 +93,6 @@ export default function App() {
         />
       )}
 
-      {/* Floating Just Play button — visible everywhere except in player */}
       {!activeChannel && (
         <JustPlayButton onPlay={handleChannelClick} preferences={preferences} />
       )}

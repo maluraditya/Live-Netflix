@@ -8,90 +8,81 @@ export default function LiveChannelCard({ channel, onClick }) {
   return (
     <div
       className="relative flex-shrink-0 cursor-pointer card-hover"
-      style={{ width: '280px' }}
+      style={{ width: '260px' }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onClick={() => onClick(channel)}
     >
-      <div className="relative rounded-xl overflow-hidden bg-gray-800 group">
+      <div className="rounded-2xl overflow-hidden"
+        style={{ background: '#1a1a1a', border: '1px solid rgba(255,255,255,0.06)' }}>
+
         {/* Thumbnail */}
-        <div className="relative" style={{ height: '158px' }}>
+        <div className="relative" style={{ height: '146px' }}>
           <img
             src={channel.thumbnail}
             alt={channel.name}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover transition-transform duration-500"
+            style={{ transform: hovered ? 'scale(1.05)' : 'scale(1)' }}
             loading="lazy"
           />
-          {/* Category gradient overlay */}
-          <div className={`absolute inset-0 bg-gradient-to-br ${channel.color} opacity-40`} />
+          <div className={`absolute inset-0 bg-gradient-to-br ${channel.color} opacity-35 transition-opacity duration-300`}
+            style={{ opacity: hovered ? 0.5 : 0.35 }} />
           <div className="absolute inset-0 channel-gradient" />
 
           {/* LIVE badge */}
-          <div className="absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 bg-red-600 rounded-md">
-            <span className="w-2 h-2 bg-white rounded-full live-dot" />
-            <span className="text-white text-xs font-bold uppercase tracking-wide">LIVE</span>
+          <div className="absolute top-3 left-3 flex items-center gap-1.5 px-2 py-1 bg-red-600 rounded-lg shadow-lg">
+            <span className="w-1.5 h-1.5 bg-white rounded-full live-dot" />
+            <span className="text-white text-xs font-bold tracking-wide">LIVE</span>
           </div>
 
-          {/* Emoji */}
-          <div className="absolute top-3 right-3 text-2xl">{channel.emoji}</div>
+          <div className="absolute top-3 right-3 text-xl">{channel.emoji}</div>
 
-          {/* Channel name */}
-          <div className="absolute bottom-3 left-3 right-3">
-            <p className="text-white font-bold text-base leading-tight">{channel.name}</p>
-            <p className="text-gray-300 text-xs mt-0.5 truncate">
-              {currentItem ? `Now: ${currentItem.title}` : 'Loading...'}
+          {/* Play button on hover */}
+          <div className={`absolute inset-0 flex items-center justify-center transition-opacity duration-200 ${hovered ? 'opacity-100' : 'opacity-0'}`}>
+            <div className="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center shadow-2xl">
+              <svg className="w-5 h-5 text-black ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z" />
+              </svg>
+            </div>
+          </div>
+
+          {/* Channel name at bottom */}
+          <div className="absolute bottom-0 left-0 right-0 px-3 pb-3">
+            <p className="text-white font-bold text-sm leading-tight">{channel.name}</p>
+            <p className="text-gray-400 text-xs mt-0.5 truncate">
+              {currentItem ? currentItem.title : 'Loading…'}
             </p>
           </div>
-
-          {/* Hover play button */}
-          {hovered && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black/30 animate-fade-in">
-              <div className="w-14 h-14 bg-white/90 rounded-full flex items-center justify-center shadow-xl">
-                <svg className="w-7 h-7 text-black ml-1" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M8 5v14l11-7z" />
-                </svg>
-              </div>
-            </div>
-          )}
         </div>
 
-        {/* Progress bar */}
-        <div className="h-0.5 bg-gray-700">
-          <div
-            className="h-full transition-all duration-1000"
-            style={{
-              width: `${progress}%`,
-              backgroundColor: channel.accentColor,
-            }}
-          />
+        {/* Live progress bar */}
+        <div className="h-0.5 bg-white/8">
+          <div className="h-full transition-all duration-1000"
+            style={{ width: `${progress}%`, backgroundColor: channel.accentColor }} />
         </div>
 
-        {/* Schedule info */}
-        <div className="p-3 bg-gray-900">
+        {/* Schedule preview */}
+        <div className="px-3 py-2.5 space-y-1.5">
           {currentItem && (
-            <div className="flex items-start gap-2 mb-2">
-              <div
-                className="w-1 h-full rounded-full flex-shrink-0 mt-1"
-                style={{ backgroundColor: channel.accentColor, minHeight: '30px' }}
-              />
+            <div className="flex items-center gap-2">
+              <div className="w-1 rounded-full flex-shrink-0 self-stretch"
+                style={{ backgroundColor: channel.accentColor, minHeight: '12px' }} />
               <div className="min-w-0">
-                <p className="text-white text-xs font-semibold truncate">{currentItem.title}</p>
-                <p className="text-gray-500 text-xs mt-0.5">{currentItem.genre}</p>
+                <p className="text-white text-xs font-medium truncate">{currentItem.title}</p>
+                <p className="text-gray-600 text-xs">{currentItem.genre}</p>
               </div>
             </div>
           )}
           {upcomingItems[0] && (
             <div className="flex items-center gap-2">
-              <div className="w-1 rounded-full bg-gray-700 flex-shrink-0" style={{ minHeight: '24px' }} />
-              <div className="min-w-0">
-                <p className="text-gray-400 text-xs truncate">Up Next: {upcomingItems[0].title}</p>
-              </div>
+              <div className="w-1 rounded-full bg-white/15 flex-shrink-0 self-stretch" style={{ minHeight: '12px' }} />
+              <p className="text-gray-500 text-xs truncate">Next: {upcomingItems[0].title}</p>
             </div>
           )}
         </div>
 
         {/* Bottom accent */}
-        <div className={`h-0.5 bg-gradient-to-r ${channel.color}`} />
+        <div className={`h-px bg-gradient-to-r ${channel.color} opacity-50`} />
       </div>
     </div>
   );
